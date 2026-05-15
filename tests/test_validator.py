@@ -4,6 +4,7 @@ from data_quality.validators import validar_lote
 from data_generation.legacy_simulator import generar_lote, guardar_como_json
 import json
 
+
 if __name__ == "__main__":
     # Generar datos
     print("🔄 Generando datos de prueba...")
@@ -27,4 +28,5 @@ if __name__ == "__main__":
     # Mostrar algunos inválidos de ejemplo
     print("\n⚠️ Ejemplos de registros inválidos:")
     for inv in invalidos[:3]:
-        print(f"   ID: {inv['siniestro_id']} - Errores: {[e['msg'] for e in inv['errores']]}")
+        errores_msg = [e.get("msg", str(e)) for e in inv.get("errores", [])] 
+        print(f"   ID: {inv['siniestro_id']} - Errores: {errores_msg}")

@@ -88,6 +88,23 @@ def validar_siniestro(siniestro: dict) -> dict:
     """
     return SiniestroValidado(**siniestro).model_dump()
 
+def limpiar_error(error: dict) -> dict:
+    """Limpia un error de Pydantic para hacerlo JSON serializable"""
+    error_limpio = {
+        "type": error.get("type", ""),
+        "loc": error.get("loc", []),
+        "msg": error.get("msg", ""),
+        "input": error.get("input"),
+    }
+    # Limpiar ctx si existe (puede contener objetos no serializables)
+    if error.get("ctx"):
+        ctx = error["ctx"]
+        if isinstance(ctx, dict):
+            error_limpio["ctx"] = {k: str(v) for k, v in ctx.items()}
+        else:
+            error_limpio["ctx"] = str(ctx)
+    return error_limpio
+
 def validar_lote(siniestros: list) -> tuple[list, list]:
     """
     Valida un lote completo.
@@ -101,10 +118,12 @@ def validar_lote(siniestros: list) -> tuple[list, list]:
             validado = validar_siniestro(siniestro)
             validos.append(validado)
         except ValidationError as e:
+             # Limpiar cada error para que sea serializable
+            errores_limpios = [limpiar_error(err) for err in e.errors()]
             invalidos.append({
                 "indice": idx,
                 "siniestro_id": siniestro.get("siniestro_id"),
-                "errores": e.errors(),
+                "errores": errores_limpios,
                 "datos_originales": siniestro
             })
     
