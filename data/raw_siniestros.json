@@ -1,0 +1,402 @@
+[
+  {
+    "siniestro_id": 53343,
+    "fecha_accidente": "16/6/2024",
+    "tipo_seguro": "",
+    "importe_reclamado": null,
+    "dni_asegurado": "88875109U",
+    "codigo_proveedor": "INVALIDO"
+  },
+  {
+    "siniestro_id": 58004,
+    "fecha_accidente": "2025-11-21",
+    "tipo_seguro": "",
+    "importe_reclamado": 253,
+    "dni_asegurado": "12243407A",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 90953,
+    "fecha_accidente": "2025-07-22",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 2057,
+    "dni_asegurado": "49194996Z",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 99870,
+    "fecha_accidente": "2025-08-27",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 6111,
+    "dni_asegurado": "41051904M",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 26045,
+    "fecha_accidente": "2027-01-11",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": -4002,
+    "dni_asegurado": "37757791V",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 36058,
+    "fecha_accidente": "2026-11-02",
+    "tipo_seguro": "",
+    "importe_reclamado": -427,
+    "dni_asegurado": "24917224",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 57856,
+    "fecha_accidente": "23/6/2022",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": -1128,
+    "dni_asegurado": "63761292O",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 14861,
+    "fecha_accidente": "2025-08-20",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": 7225,
+    "dni_asegurado": "55896176M",
+    "codigo_proveedor": "INVALIDO"
+  },
+  {
+    "siniestro_id": 91713,
+    "fecha_accidente": "2026-04-13",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 7446,
+    "dni_asegurado": "92220809F",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 68287,
+    "fecha_accidente": "2025-06-30",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": 9092,
+    "dni_asegurado": "12943952V",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 16074,
+    "fecha_accidente": "2026-03-09",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": 1954,
+    "dni_asegurado": "22229224P",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 42467,
+    "fecha_accidente": "2025-10-09",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 323,
+    "dni_asegurado": "10381670P",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 74923,
+    "fecha_accidente": "2026-01-04",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": 6072,
+    "dni_asegurado": "98646713B",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 98947,
+    "fecha_accidente": "2026-02-20",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": 6575,
+    "dni_asegurado": "17486605A",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 96894,
+    "fecha_accidente": "2026-10-10",
+    "tipo_seguro": "",
+    "importe_reclamado": -2368,
+    "dni_asegurado": "318799375X",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 17216,
+    "fecha_accidente": "2025-12-18",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 7448,
+    "dni_asegurado": "40463820J",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 92620,
+    "fecha_accidente": "2026-05-11",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 9729,
+    "dni_asegurado": "12877235C",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 74010,
+    "fecha_accidente": "2025-06-16",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 4953,
+    "dni_asegurado": "65382329X",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 41562,
+    "fecha_accidente": "2026-04-28",
+    "tipo_seguro": "",
+    "importe_reclamado": 9033,
+    "dni_asegurado": "29231616Z",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 79279,
+    "fecha_accidente": "2025-07-07",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 1209,
+    "dni_asegurado": "24253848G",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 90565,
+    "fecha_accidente": "15/5/2025",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": -4733,
+    "dni_asegurado": "78426245C",
+    "codigo_proveedor": "INVALIDO"
+  },
+  {
+    "siniestro_id": 60416,
+    "fecha_accidente": "2025-07-02",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": 5542,
+    "dni_asegurado": "33576691R",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 91725,
+    "fecha_accidente": "2026-04-22",
+    "tipo_seguro": "",
+    "importe_reclamado": 4310,
+    "dni_asegurado": "58098183J",
+    "codigo_proveedor": "INVALIDO"
+  },
+  {
+    "siniestro_id": 56988,
+    "fecha_accidente": "2025-06-19",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": 9091,
+    "dni_asegurado": "17307559Y",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 88994,
+    "fecha_accidente": "5/8/2024",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": -784,
+    "dni_asegurado": "75306498",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 64931,
+    "fecha_accidente": "15/1/2023",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": -345,
+    "dni_asegurado": "52497216C",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 42706,
+    "fecha_accidente": "1/3/2021",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": null,
+    "dni_asegurado": "403274811X",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 97058,
+    "fecha_accidente": "2025-05-24",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 7389,
+    "dni_asegurado": "21768604Y",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 47292,
+    "fecha_accidente": "2027-02-13",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": -33,
+    "dni_asegurado": "16857438",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 74878,
+    "fecha_accidente": "19/1/2022",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": null,
+    "dni_asegurado": "38689621",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 94003,
+    "fecha_accidente": "2025-08-01",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 4674,
+    "dni_asegurado": "99882048B",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 80636,
+    "fecha_accidente": "2025-09-20",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": 9614,
+    "dni_asegurado": "14023588X",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 56660,
+    "fecha_accidente": "2026-02-03",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": 1524,
+    "dni_asegurado": "36447990X",
+    "codigo_proveedor": "INVALIDO"
+  },
+  {
+    "siniestro_id": 25377,
+    "fecha_accidente": "2025-07-13",
+    "tipo_seguro": "",
+    "importe_reclamado": 8908,
+    "dni_asegurado": "95933305Z",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 90435,
+    "fecha_accidente": "2026-01-31",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": 5598,
+    "dni_asegurado": "77332320M",
+    "codigo_proveedor": "INVALIDO"
+  },
+  {
+    "siniestro_id": 72590,
+    "fecha_accidente": "2027-04-01",
+    "tipo_seguro": "",
+    "importe_reclamado": -706,
+    "dni_asegurado": "473072724X",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 62884,
+    "fecha_accidente": "2025-06-03",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": 1922,
+    "dni_asegurado": "93718325E",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 92696,
+    "fecha_accidente": "2/12/2020",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": -2389,
+    "dni_asegurado": "537393101X",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 84556,
+    "fecha_accidente": "2025-06-28",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": 3083,
+    "dni_asegurado": "80444555C",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 25896,
+    "fecha_accidente": "2025-08-02",
+    "tipo_seguro": "SALUD",
+    "importe_reclamado": 9157,
+    "dni_asegurado": "13353278D",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 21484,
+    "fecha_accidente": "10/7/2024",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": -232,
+    "dni_asegurado": "57370790",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 67175,
+    "fecha_accidente": "2026-02-10",
+    "tipo_seguro": "",
+    "importe_reclamado": 3744,
+    "dni_asegurado": "51126058Y",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 48843,
+    "fecha_accidente": "2026-06-21",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": -2358,
+    "dni_asegurado": "63357473",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 33448,
+    "fecha_accidente": "2025-07-03",
+    "tipo_seguro": "",
+    "importe_reclamado": 5340,
+    "dni_asegurado": "42713508E",
+    "codigo_proveedor": null
+  },
+  {
+    "siniestro_id": 39476,
+    "fecha_accidente": "2026-02-06",
+    "tipo_seguro": "COCHE",
+    "importe_reclamado": 3230,
+    "dni_asegurado": "32696324W",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 99126,
+    "fecha_accidente": "15/2/2025",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": null,
+    "dni_asegurado": "970300823X",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 91397,
+    "fecha_accidente": "2026-01-12",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": 1802,
+    "dni_asegurado": "15955316A",
+    "codigo_proveedor": "TALLER_001"
+  },
+  {
+    "siniestro_id": 95221,
+    "fecha_accidente": "2025-06-10",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": 7304,
+    "dni_asegurado": "27115315D",
+    "codigo_proveedor": "TALLER_002"
+  },
+  {
+    "siniestro_id": 41866,
+    "fecha_accidente": "2025-05-22",
+    "tipo_seguro": "HOGAR",
+    "importe_reclamado": 926,
+    "dni_asegurado": "71213623P",
+    "codigo_proveedor": "HOSP_002"
+  },
+  {
+    "siniestro_id": 98670,
+    "fecha_accidente": "2025-06-08",
+    "tipo_seguro": "",
+    "importe_reclamado": 3516,
+    "dni_asegurado": "37513976D",
+    "codigo_proveedor": "TALLER_001"
+  }
+]
