@@ -1,0 +1,20 @@
+cat > .gitignore << 'EOF'
+# Entorno virtual
+venv/
+__pycache__/
+*.pyc
+
+# Datos generados
+data/*.json
+!data/.gitkeep
+
+# Variables de entorno
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+EOF
