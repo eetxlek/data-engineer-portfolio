@@ -62,6 +62,7 @@ data-engineer-portfolio/
 | **Validación** | `raw_siniestros.jsonl` | `validos.jsonl` / `invalidos.jsonl` | Pydantic |
 | **Transformación** | `validos.jsonl` | Parquet particionado | PySpark |
 | **Almacenamiento** | Parquet | Data Lake local / MinIO | Parquet + MinIO |
+| **Trazabilidad** | Todas las fases | `pipeline_trace.jsonl` | Python |
 
 ---
 
@@ -84,7 +85,7 @@ data-engineer-portfolio/
 
 ```bash
 # Clonar repositorio
-git clone <repo-url>
+git clone https://github.com/eetxlek/data-engineer-portfolio.git
 cd data-engineer-portfolio
 
 # Crear entorno virtual
@@ -146,6 +147,20 @@ Los registros válidos se almacenan en Parquet particionado por:
 
 ---
 
+## 🔎 Trazabilidad del Pipeline
+
+Cada ejecución genera un log estructurado en `data/pipeline_trace.jsonl` con métricas por fase:
+
+```json
+{"fase": "ingesta", "timestamp": "2026-05-16T10:00:01", "registros_generados": 100, "tasa_error_configurada": 0.05, "estado": "ok"}
+{"fase": "validacion", "timestamp": "2026-05-16T10:00:01", "registros_validos": 95, "registros_invalidos": 5, "tasa_rechazo": 0.05, "motivos_rechazo": {"DNI inválido": 3, "importe fuera de rango": 2}, "estado": "ok"}
+{"fase": "transformacion_spark", "timestamp": "2026-05-16T10:00:45", "registros_entrada": 95, "registros_salida": 95, "particiones_generadas": ["HOGAR", "COCHE", "SALUD"], "formato": "parquet", "estado": "ok"}
+```
+
+El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las anteriores, permitiendo auditar el histórico completo del pipeline.
+
+---
+
 ## 🛠️ Stack Tecnológico
 
 | Categoría | Tecnologías |
@@ -155,3 +170,16 @@ Los registros válidos se almacenan en Parquet particionado por:
 | **Formatos** | JSONL, Parquet |
 | **Contenedores** | Docker, Docker Compose |
 | **Storage** | MinIO (S3-compatible), Sistema de ficheros local |
+
+---
+
+## 👤 Autor
+
+**Eetxlek** - Data Engineer
+
+- GitHub: [@eetxlek](https://github.com/eetxlek)
+- Proyecto: [data-engineer-portfolio](https://github.com/eetxlek/data-engineer-portfolio)
+
+---
+
+⭐ Si este proyecto te ha sido útil ⭐ 
