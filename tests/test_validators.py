@@ -39,6 +39,40 @@ def leer_jsonl(filepath: str) -> list:
                 datos.append(json.loads(linea))
     return datos
 
+def guardar_log_validacion(lote, validos, invalidos, filepath="data/pipeline_trace.jsonl"):
+    motivos = {}
+    for inv in invalidos:
+        for error in inv.get("errores", []):
+            msg = error.get("msg", "desconocido")
+            motivos[msg] = motivos.get(msg, 0) + 1
+
+    fases = [
+        {
+            "fase": "ingesta",
+            "timestamp": datetime.now().isoformat(),
+            "registros_generados": len(lote),
+            "tasa_error_configurada": 0.05,
+            "estado": "ok"
+        },
+        {
+            "fase": "validacion",
+            "timestamp": datetime.now().isoformat(),
+            "registros_entrada": len(lote),
+            "registros_validos": len(validos),
+            "registros_invalidos": len(invalidos),
+            "tasa_rechazo": round(len(invalidos) / len(lote), 4),
+            "motivos_rechazo": motivos,
+            "estado": "ok"
+        }
+    ]
+
+    os.makedirs("data", exist_ok=True)
+    with open(filepath, "a", encoding="utf-8") as f:
+        for fase in fases:
+            f.write(json.dumps(fase, ensure_ascii=False) + "\n")
+
+    print(f"\n🔎 Trazabilidad guardada en {filepath}")
+
 if __name__ == "__main__":
     # Generar datos
     print("🔄 Generando datos de prueba...")
@@ -79,3 +113,5 @@ if __name__ == "__main__":
     for inv in invalidos[:3]:
         errores_msg = [e.get("msg", str(e)) for e in inv.get("errores", [])]
         print(f"   ID: {inv.get('siniestro_id')} - Errores: {errores_msg}")
+    
+    guardar_log_validacion(lote, validos, invalidos)
