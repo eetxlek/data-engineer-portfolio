@@ -6,7 +6,11 @@ __pycache__/
 
 # Datos generados
 data/*.json
+data/*.jsonl
 !data/.gitkeep
+
+# Lake (Parquet files - pueden ser grandes)
+data/lake/
 
 # Variables de entorno
 .env
@@ -17,4 +21,10 @@ data/*.json
 
 # OS
 .DS_Store
+
+# Logs
+*.log
+spark-warehouse/
+metastore_db/
+derby.log
 EOF
