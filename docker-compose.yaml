@@ -1,0 +1,85 @@
+version: "3.8"
+
+services:
+
+  # ─────────────────────────────────────────
+  # Apache Spark Master
+  # ─────────────────────────────────────────
+  spark-master:
+    build: .
+    image: spark-pipeline:local
+    container_name: spark-master
+    user: root
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    environment:
+      SPARK_MASTER_HOST: spark-master
+      SPARK_MASTER_PORT: 7077
+      SPARK_MASTER_WEBUI_PORT: 8080
+    ports:
+      - "8080:8080"   # Spark UI
+      - "7077:7077"   # Spark master port
+    volumes:
+      - ./src:/opt/spark/work-dir/src
+      - ./tests:/opt/spark/work-dir/tests
+      - ./data:/opt/spark/work-dir/data
+
+  # ─────────────────────────────────────────
+  # Apache Spark Worker
+  # ─────────────────────────────────────────
+  spark-worker:
+    image: spark-pipeline:local
+    container_name: spark-worker
+    user: root
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    environment:
+      SPARK_WORKER_MEMORY: 2g
+      SPARK_WORKER_CORES: 2
+      SPARK_WORKER_WEBUI_PORT: 8081
+    ports:
+      - "8081:8081"   # Worker UI
+    depends_on:
+      - spark-master
+    volumes:
+      - ./src:/opt/spark/work-dir/src
+      - ./tests:/opt/spark/work-dir/tests
+      - ./data:/opt/spark/work-dir/data
+
+  # ─────────────────────────────────────────
+  # MinIO  (S3-compatible object storage)
+  # ─────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # MinIO Console
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────────
+  # MinIO bucket initializer (one-shot)
+  # ─────────────────────────────────────────
+  minio-init:
+    image: minio/mc:latest
+    container_name: minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 minioadmin minioadmin;
+        mc mb --ignore-existing local/data-lake;
+        echo 'Bucket data-lake ready.';
+      "
+
+volumes:
+  minio_data:

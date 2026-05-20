@@ -1,8 +1,8 @@
 # 🏗️ End-to-End Data Pipeline: Legacy to Lake
 
-[![Python 3.14](https://img.shields.io/badge/python-3.14-blue.svg)](https://www.python.org/)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![PySpark](https://img.shields.io/badge/Spark-3.5-orange.svg)](https://spark.apache.org/)
-[![Pydantic](https://img.shields.io/badge/pydantic-2.13-green.svg)](https://docs.pydantic.dev/)
+[![Pydantic](https://img.shields.io/badge/pydantic-2.7-green.svg)](https://docs.pydantic.dev/)
 [![Docker](https://img.shields.io/badge/docker-compose-blue.svg)](https://www.docker.com/)
 
 > Pipeline ETL/ELT que simula la migración de datos desde un sistema **legacy (mainframe)** a un **Data Lake moderno**, demostrando validación, procesamiento distribuido y almacenamiento optimizado.
@@ -47,7 +47,8 @@ data-engineer-portfolio/
 │   └── lake/
 │       └── siniestros/                # Parquet particionado por tipo y año
 │
-├── docker-compose.yml                 # Infraestructura (Spark + MinIO)
+├── docker-compose.yaml                # Infraestructura (Spark + MinIO)
+├── Dockerfile                         # Imagen personalizada con dependencias Python
 ├── requirements.txt
 └── README.md
 ```
@@ -109,23 +110,26 @@ python src/spark_jobs/transform_to_parquet.py
 ### Ejecución con Docker Compose
 
 ```bash
-# Levantar cluster Spark + MinIO
+# 1. Construir la imagen personalizada (solo la primera vez, o al cambiar requirements.txt)
+docker compose build
+
+# 2. Levantar el cluster Spark + MinIO
 docker compose up -d
 
-# Instalar dependencias en el contenedor Spark
-docker exec -u root spark-master bash -c "apt-get update && apt-get install -y python3 python3-pip"
-docker exec spark-master pip3 install pydantic
-
-# Ejecutar pipeline dentro del contenedor
+# 3. Ejecutar el pipeline
 docker exec spark-master python3 tests/test_validators.py
 docker exec spark-master spark-submit src/spark_jobs/transform_to_parquet.py
 ```
+
+> La imagen incluye todas las dependencias Python necesarias (pydantic, pyspark, etc.).
+> No es necesario instalar nada manualmente en el contenedor.
 
 ### Interfaces web disponibles
 
 | Servicio | URL | Credenciales |
 |---|---|---|
 | Spark UI | http://localhost:8080 | — |
+| Spark Worker UI | http://localhost:8081 | — |
 | MinIO Console | http://localhost:9001 | `minioadmin` / `minioadmin` |
 
 ---
@@ -165,8 +169,8 @@ El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las 
 
 | Categoría | Tecnologías |
 |---|---|
-| **Core Data** | Python, PySpark, Pandas |
-| **Validación** | Pydantic |
+| **Core Data** | Python 3.11, PySpark 3.5, Pandas |
+| **Validación** | Pydantic 2.7 |
 | **Formatos** | JSONL, Parquet |
 | **Contenedores** | Docker, Docker Compose |
 | **Storage** | MinIO (S3-compatible), Sistema de ficheros local |
@@ -182,4 +186,4 @@ El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las 
 
 ---
 
-⭐ Si este proyecto te ha sido útil ⭐ 
+⭐ Si este proyecto te ha sido útil ⭐
