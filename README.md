@@ -40,6 +40,11 @@ data-engineer-portfolio/
 ├── tests/
 │   └── test_validators.py             # Tests del pipeline completo
 │
+├── sql/
+│   ├── bronze_queries.sql             # Consultas sobre datos crudos (detección de errores)
+│   ├── silver_queries.sql             # Consultas sobre datos limpios y estandarizados
+│   └── gold_kpi.sql                   # KPIs de negocio y agregaciones finales
+│
 ├── data/
 │   ├── raw_siniestros.jsonl           # Datos sin procesar (salida del simulador)
 │   ├── siniestros_validos.jsonl       # Registros que superan validación
@@ -134,6 +139,41 @@ docker exec spark-master spark-submit src/spark_jobs/transform_to_parquet.py
 
 ---
 
+## 🗄️ Arquitectura Medallion (SQL)
+
+Las queries SQL siguen el patrón **Bronze → Silver → Gold**, ejecutables sobre el Data Lake generado por el pipeline. Requieren que el Parquet esté generado previamente.
+
+| Capa | Archivo | Descripción |
+|---|---|---|
+| **Bronze** | `sql/bronze_queries.sql` | Datos crudos: detección de errores, registros inválidos, tasa de rechazo |
+| **Silver** | `sql/silver_queries.sql` | Datos limpios: agregaciones por tipo, estacionalidad, actividad por proveedor |
+| **Gold** | `sql/gold_kpi.sql` | KPIs de negocio: coste total, evolución anual, ranking de proveedores, outliers |
+
+### Ejecución de queries con Spark SQL
+
+```bash
+# Entrar en la shell interactiva de Spark SQL
+docker exec -it spark-master spark-sql
+```
+
+Cada archivo comienza registrando la vista Parquet correspondiente:
+
+```sql
+-- Bronze: apunta al lake completo
+CREATE OR REPLACE TEMP VIEW siniestros_bronze AS
+SELECT * FROM parquet.`data/lake/siniestros/`;
+
+-- Verificar que hay datos
+SELECT tipo_seguro, COUNT(*) AS total
+FROM siniestros_bronze
+GROUP BY tipo_seguro;
+```
+
+> Las queries SQL solo tienen sentido una vez ejecutado el pipeline completo
+> (`test_validators.py` + `transform_to_parquet.py`).
+
+---
+
 ## 📈 Resultados Esperados
 
 Con una tasa de error del 5% (`tasa_error=0.05`) sobre 100 registros:
@@ -171,6 +211,7 @@ El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las 
 |---|---|
 | **Core Data** | Python 3.11, PySpark 3.5, Pandas |
 | **Validación** | Pydantic 2.7 |
+| **SQL / Análisis** | Spark SQL (Bronze / Silver / Gold) |
 | **Formatos** | JSONL, Parquet |
 | **Contenedores** | Docker, Docker Compose |
 | **Storage** | MinIO (S3-compatible), Sistema de ficheros local |
