@@ -150,6 +150,32 @@ Las queries SQL siguen el patrón **Bronze → Silver → Gold**, ejecutables so
 | **Silver** | `sql/silver_queries.sql` | Datos limpios: agregaciones por tipo, estacionalidad, actividad por proveedor |
 | **Gold** | `sql/gold_kpi.sql` | KPIs de negocio: coste total, evolución anual, ranking de proveedores, outliers |
 
+## ⚡ Delta Lake vs Parquet
+
+La capa de almacenamiento usa Delta Lake sobre Parquet, lo que añade capacidades que Parquet puro no tiene:
+
+**Transaccionalidad** — cada escritura genera una versión en `_delta_log/`. Si el job falla a mitad, no quedan datos corruptos. Con Parquet un fallo dejaba el lake en estado inconsistente.
+
+**Versionado automático** — cada ejecución incrementa `delta_version`. Puedes consultar el estado del lake en cualquier versión anterior con `VERSION AS OF N`. Con Parquet los datos anteriores se perdían en cada overwrite.
+
+**Trazabilidad real** — el `pipeline_trace.jsonl` incluye `delta_version` y `delta_operacion` extraídos del transaction log de Delta, no de conteos manuales. Es auditoría real, no logging artesanal.
+
+**MERGE preparado** — aunque no se usa aún, la tabla ya admite upserts atómicos. Con Parquet corregir un registro significaba reescribir toda la partición.
+
+**Schema enforcement** — Delta rechaza escrituras que no respeten el esquema definido. Con Parquet podías escribir columnas de tipo incorrecto sin error.
+
+| Capacidad | Parquet | Delta Lake |
+|---|---|---|
+| Transaccionalidad ACID | ❌ | ✅ |
+| Versionado automático | ❌ | ✅ `VERSION AS OF N` |
+| Time travel | ❌ | ✅ |
+| MERGE / upserts atómicos | ❌ | ✅ |
+| Schema enforcement | ❌ | ✅ |
+| Auditoría de operaciones | ❌ | ✅ `DESCRIBE HISTORY` |
+| Formato de datos en disco | Parquet | Parquet + `_delta_log/` |
+
+> Los datos en disco siguen siendo ficheros `.parquet`. Delta añade un transaction log (`_delta_log/`) encima sin cambiar el formato de almacenamiento.
+
 ### Ejecución de queries con Spark SQL
 
 ```bash
