@@ -1,11 +1,15 @@
 -- ============================================================
--- PASO 0 — Registrar la fuente Parquet como vista consultable
+-- PASO 0 — Registrar la fuente Delta Lake como vista consultable
 -- Ejecutar esto antes que cualquier query
 -- ============================================================
 -- Vista temporal de todos los siniestros validados
 CREATE OR REPLACE TEMP VIEW bronze_siniestros AS
 SELECT *
-FROM parquet.`data/lake/siniestros/`;
+FROM delta.`data/lake/siniestros_delta/`;
+-- Consultar una versión anterior específica. Capacidad sin activar por defecto
+-- VERSION AS OF 2;
+-- Consultar por timestamp. Capacidad sin activar por defecto
+-- TIMESTAMP AS OF '2026-05-16T10:00:00';
 
 -- ============================================================
 -- BRONZE LAYER — Datos crudos validados

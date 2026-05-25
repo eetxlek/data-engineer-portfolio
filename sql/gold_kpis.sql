@@ -4,7 +4,7 @@ SELECT * FROM siniestros_silver;
 
 -- ============================================================
 -- GOLD LAYER — KPIs de negocio
--- Fuente: siniestros_silver / lake/siniestros/ (Parquet)
+-- Fuente: siniestros_silver / lake/siniestros_delta/ (Delta Lake)
 -- Agregaciones finales para reporting y toma de decisiones
 -- ============================================================
 

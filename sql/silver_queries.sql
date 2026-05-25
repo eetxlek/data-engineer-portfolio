@@ -1,11 +1,11 @@
 -- silver: solo válidos, con campos derivados
 CREATE OR REPLACE TEMP VIEW siniestros_silver AS
 SELECT *, YEAR(fecha_accidente) AS anio_accidente
-FROM parquet.`data/lake/siniestros/`;
+FROM delta.`data/lake/siniestros_delta/`;
 
 -- ============================================================
 -- SILVER LAYER — Datos limpios y estandarizados
--- Fuente: siniestros_validos.jsonl / lake/siniestros/ (Parquet)
+-- Fuente: siniestros_validos.jsonl / lake/siniestros_delta/ (Delta Lake)
 -- Solo contiene registros que superaron la validación Pydantic
 -- ============================================================
 

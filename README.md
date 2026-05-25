@@ -4,6 +4,7 @@
 [![PySpark](https://img.shields.io/badge/Spark-3.5-orange.svg)](https://spark.apache.org/)
 [![Pydantic](https://img.shields.io/badge/pydantic-2.7-green.svg)](https://docs.pydantic.dev/)
 [![Docker](https://img.shields.io/badge/docker-compose-blue.svg)](https://www.docker.com/)
+[![Delta Lake](https://img.shields.io/badge/delta--lake-3.2-blue.svg)](https://delta.io/)
 
 > Pipeline ETL/ELT que simula la migración de datos desde un sistema **legacy (mainframe)** a un **Data Lake moderno**, demostrando validación, procesamiento distribuido y almacenamiento optimizado.
 
@@ -14,7 +15,7 @@
 ```
 ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
 │   Legacy System  │───▶│    Validator     │────▶│      Spark       │───▶│    Data Lake     │
-│   (Simulador)    │     │   (Pydantic)     │     │    (PySpark)     │     │    (Parquet)     │
+│   (Simulador)    │     │   (Pydantic)     │     │    (PySpark)     │     │    (Delta lake)  │
 └──────────────────┘     └──────────────────┘     └──────────────────┘     └──────────────────┘
          │                        │                        │                        │
          ▼                        ▼                        ▼                        ▼
@@ -35,7 +36,7 @@ data-engineer-portfolio/
 │   ├── data_quality/
 │   │   └── validators.py              # Validación y gobierno del dato con Pydantic
 │   └── spark_jobs/
-│       └── transform_to_parquet.py    # Transformación y escritura con PySpark
+│       └── transform_to_delta.py     # Transformación y escritura con PySpark + Delta
 │
 ├── tests/
 │   └── test_validators.py             # Tests del pipeline completo
@@ -50,7 +51,7 @@ data-engineer-portfolio/
 │   ├── siniestros_validos.jsonl       # Registros que superan validación
 │   ├── siniestros_invalidos.jsonl     # Registros rechazados con motivo
 │   └── lake/
-│       └── siniestros/                # Parquet particionado por tipo y año
+│       └── siniestros_delta/          # Delta Lake particionado por tipo y año
 │
 ├── docker-compose.yaml                # Infraestructura (Spark + MinIO)
 ├── Dockerfile                         # Imagen personalizada con dependencias Python
@@ -66,8 +67,8 @@ data-engineer-portfolio/
 |---|---|---|---|
 | **Ingesta** | Generación sintética | `raw_siniestros.jsonl` | Python |
 | **Validación** | `raw_siniestros.jsonl` | `validos.jsonl` / `invalidos.jsonl` | Pydantic |
-| **Transformación** | `validos.jsonl` | Parquet particionado | PySpark |
-| **Almacenamiento** | Parquet | Data Lake local / MinIO | Parquet + MinIO |
+| **Transformación** | `validos.jsonl` | Delta Lake particionado | PySpark + Delta Lake |
+| **Almacenamiento** | Delta Lake | Data Lake local / MinIO | Delta Lake + MinIO |
 | **Trazabilidad** | Todas las fases | `pipeline_trace.jsonl` | Python |
 
 ---
@@ -108,8 +109,8 @@ pip install -r requirements.txt
 # 1. Generar datos y ejecutar validaciones
 python tests/test_validators.py
 
-# 2. Transformar datos válidos a Parquet con Spark
-python src/spark_jobs/transform_to_parquet.py
+# 2. Transformar datos válidos a Delta Lake con Spark
+python src/spark_jobs/transform_to_delta.py
 ```
 
 ### Ejecución con Docker Compose
@@ -123,7 +124,7 @@ docker compose up -d
 
 # 3. Ejecutar el pipeline
 docker exec spark-master python3 tests/test_validators.py
-docker exec spark-master spark-submit src/spark_jobs/transform_to_parquet.py
+docker exec -w /opt/spark/work-dir spark-master spark-submit src/spark_jobs/transform_to_delta.py
 ```
 
 > La imagen incluye todas las dependencias Python necesarias (pydantic, pyspark, etc.).
@@ -141,7 +142,7 @@ docker exec spark-master spark-submit src/spark_jobs/transform_to_parquet.py
 
 ## 🗄️ Arquitectura Medallion (SQL)
 
-Las queries SQL siguen el patrón **Bronze → Silver → Gold**, ejecutables sobre el Data Lake generado por el pipeline. Requieren que el Parquet esté generado previamente.
+Las queries SQL siguen el patrón **Bronze → Silver → Gold**, ejecutables sobre el Data Lake generado por el pipeline. Requieren que la tabla Delta esté generada previamente.
 
 | Capa | Archivo | Descripción |
 |---|---|---|
@@ -153,15 +154,15 @@ Las queries SQL siguen el patrón **Bronze → Silver → Gold**, ejecutables so
 
 ```bash
 # Entrar en la shell interactiva de Spark SQL
-docker exec -it spark-master spark-sql
+docker exec -it -w /opt/spark/work-dir spark-master spark-sql
 ```
 
-Cada archivo comienza registrando la vista Parquet correspondiente:
+Cada archivo comienza registrando la vista Delta Lake correspondiente:
 
 ```sql
 -- Bronze: apunta al lake completo
 CREATE OR REPLACE TEMP VIEW siniestros_bronze AS
-SELECT * FROM parquet.`data/lake/siniestros/`;
+SELECT * FROM delta.`data/lake/siniestros_delta/`;
 
 -- Verificar que hay datos
 SELECT tipo_seguro, COUNT(*) AS total
@@ -170,7 +171,7 @@ GROUP BY tipo_seguro;
 ```
 
 > Las queries SQL solo tienen sentido una vez ejecutado el pipeline completo
-> (`test_validators.py` + `transform_to_parquet.py`).
+> (`test_validators.py` + `transform_to_delta.py`).
 
 ---
 
@@ -184,7 +185,7 @@ Con una tasa de error del 5% (`tasa_error=0.05`) sobre 100 registros:
    ❌ Inválidos:   5
 ```
 
-Los registros válidos se almacenan en Parquet particionado por:
+Los registros válidos se almacenan en Delta Lake particionado por:
 
 - `tipo_seguro` → `HOGAR` | `COCHE` | `SALUD`
 - `anio_accidente` → extraído de `fecha_accidente`
@@ -197,8 +198,8 @@ Cada ejecución genera un log estructurado en `data/pipeline_trace.jsonl` con m�
 
 ```json
 {"fase": "ingesta", "timestamp": "2026-05-16T10:00:01", "registros_generados": 100, "tasa_error_configurada": 0.05, "estado": "ok"}
-{"fase": "validacion", "timestamp": "2026-05-16T10:00:01", "registros_validos": 95, "registros_invalidos": 5, "tasa_rechazo": 0.05, "motivos_rechazo": {"DNI inválido": 3, "importe fuera de rango": 2}, "estado": "ok"}
-{"fase": "transformacion_spark", "timestamp": "2026-05-16T10:00:45", "registros_entrada": 95, "registros_salida": 95, "particiones_generadas": ["HOGAR", "COCHE", "SALUD"], "formato": "parquet", "estado": "ok"}
+{"fase": "validacion", "timestamp": "2026-05-16T10:00:01", "registros_entrada": 100, "registros_validos": 95, "registros_invalidos": 5, "tasa_rechazo": 0.05, "motivos_rechazo": {"DNI inválido": 3, "importe fuera de rango": 2}, "estado": "ok"}
+{"fase": "transformacion_delta", "timestamp": "2026-05-16T10:00:45", "registros_entrada": 95, "registros_salida": 95, "particiones_generadas": ["HOGAR", "COCHE", "SALUD"], "columnas_añadidas": ["anio_accidente", "rango_importe"], "output_path": "data/lake/siniestros_delta", "formato": "delta", "delta_version": 0, "delta_operacion": "WRITE", "estado": "ok"}
 ```
 
 El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las anteriores, permitiendo auditar el histórico completo del pipeline.
@@ -212,7 +213,7 @@ El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las 
 | **Core Data** | Python 3.11, PySpark 3.5, Pandas |
 | **Validación** | Pydantic 2.7 |
 | **SQL / Análisis** | Spark SQL (Bronze / Silver / Gold) |
-| **Formatos** | JSONL, Parquet |
+| **Formatos** | JSONL, Parquet, Delta Lake |
 | **Contenedores** | Docker, Docker Compose |
 | **Storage** | MinIO (S3-compatible), Sistema de ficheros local |
 
