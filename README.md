@@ -178,7 +178,7 @@ Las queries SQL siguen el patrón **Bronze → Silver → Gold**, ejecutables so
 El pipeline incorpora **dbt (data build tool)** para transformaciones SQL versionadas sobre el Delta Lake, siguiendo el patrón **Silver → Gold**.
 
 ### Arquitectura dbt
-
+```
 ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
 │   Delta Lake     │───▶│   dbt Silver     │────▶│   dbt Gold       │
 │   (Bronze)       │     │   (Limpieza)     │     │   (KPIs)         │
@@ -187,7 +187,7 @@ El pipeline incorpora **dbt (data build tool)** para transformaciones SQL versio
          ▼                        ▼                        ▼
    siniestros_delta/      silver_siniestros       gold_kpi_mensual
                                                   gold_top_proveedores
-
+```
 
 ### Modelos dbt
 
