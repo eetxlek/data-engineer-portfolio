@@ -222,16 +222,20 @@ docker exec -d dbt dbt docs serve --host 0.0.0.0 --port 8083
 
 dbt utiliza DuckDB como motor analítico, permitiendo consultas SQL directamente sobre las tablas generadas desde dentro del contenedor:
 
+```bash
 # Entrar al entorno interactivo
 docker exec -it dbt duckdb /dbt_project/analytics.duckdb
+```
 
-# Dentro de DuckDB:
+```sql
+-- Dentro de DuckDB:
 SELECT * FROM gold_kpi_mensual;
 
 SELECT codigo_proveedor, total_siniestros, importe_total
 FROM gold_top_proveedores
 ORDER BY importe_total DESC
 LIMIT 10;
+```
 
 ---
 
