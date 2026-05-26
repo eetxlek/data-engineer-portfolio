@@ -5,6 +5,8 @@
 [![Pydantic](https://img.shields.io/badge/pydantic-2.7-green.svg)](https://docs.pydantic.dev/)
 [![Docker](https://img.shields.io/badge/docker-compose-blue.svg)](https://www.docker.com/)
 [![Delta Lake](https://img.shields.io/badge/delta--lake-3.2-blue.svg)](https://delta.io/)
+[![dbt](https://img.shields.io/badge/dbt-1.11-orange.svg)](https://www.getdbt.com/)
+[![DuckDB](https://img.shields.io/badge/DuckDB-1.5.3-yellow.svg)](https://duckdb.org/)
 
 > Pipeline ETL/ELT que simula la migración de datos desde un sistema **legacy (mainframe)** a un **Data Lake moderno**, demostrando validación, procesamiento distribuido y almacenamiento optimizado.
 
@@ -46,6 +48,20 @@ data-engineer-portfolio/
 │   ├── silver_queries.sql             # Consultas sobre datos limpios y estandarizados
 │   └── gold_kpi.sql                   # KPIs de negocio y agregaciones finales
 │
+├── dbt/
+│   ├── dbt_project.yml           # Configuración del proyecto
+│   ├── profiles.yml              # Conexión a DuckDB + Delta Lake
+│   ├── models/
+│   │   ├── silver/
+│   │   │   └── silver_siniestros.sql
+│   │   └── gold/
+│   │       ├── gold_kpi_mensual.sql
+│   │       └── gold_top_proveedores.sql
+│   ├── analyses/
+│   │   └── analisis_outliers.sql
+│   └── macros/
+│       └── calcular_estacionalidad.sql
+│    
 ├── data/
 │   ├── raw_siniestros.jsonl           # Datos sin procesar (salida del simulador)
 │   ├── siniestros_validos.jsonl       # Registros que superan validación
@@ -119,12 +135,16 @@ python src/spark_jobs/transform_to_delta.py
 # 1. Construir la imagen personalizada (solo la primera vez, o al cambiar requirements.txt)
 docker compose build
 
-# 2. Levantar el cluster Spark + MinIO
-docker compose up -d
+# 2. Levantar toda la infraestructura (Spark + MinIO + dbt)
+docker compose --profile dbt up -d
 
-# 3. Ejecutar el pipeline
-docker exec spark-master python3 tests/test_validators.py
-docker exec -w /opt/spark/work-dir spark-master spark-submit src/spark_jobs/transform_to_delta.py
+# 3. Ejecutar el pipeline completo
+docker exec spark-master python tests/test_validators.py
+docker exec spark-master spark-submit src/spark_jobs/transform_to_delta.py
+docker exec dbt dbt run
+
+# 4. Verificar resultados
+docker exec dbt duckdb /dbt_project/analytics.duckdb -c "SELECT * FROM gold_kpi_mensual;"
 ```
 
 > La imagen incluye todas las dependencias Python necesarias (pydantic, pyspark, etc.).
@@ -137,6 +157,7 @@ docker exec -w /opt/spark/work-dir spark-master spark-submit src/spark_jobs/tran
 | Spark UI | http://localhost:8080 | — |
 | Spark Worker UI | http://localhost:8081 | — |
 | MinIO Console | http://localhost:9001 | `minioadmin` / `minioadmin` |
+| dbt Docs | http://localhost:8083 | — |
 
 ---
 
@@ -149,6 +170,70 @@ Las queries SQL siguen el patrón **Bronze → Silver → Gold**, ejecutables so
 | **Bronze** | `sql/bronze_queries.sql` | Datos crudos: detección de errores, registros inválidos, tasa de rechazo |
 | **Silver** | `sql/silver_queries.sql` | Datos limpios: agregaciones por tipo, estacionalidad, actividad por proveedor |
 | **Gold** | `sql/gold_kpi.sql` | KPIs de negocio: coste total, evolución anual, ranking de proveedores, outliers |
+
+---
+
+## 🔄 Transformaciones Analíticas con dbt
+
+El pipeline incorpora **dbt (data build tool)** para transformaciones SQL versionadas sobre el Delta Lake, siguiendo el patrón **Silver → Gold**.
+
+### Arquitectura dbt
+
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│   Delta Lake     │───▶│   dbt Silver     │────▶│   dbt Gold       │
+│   (Bronze)       │     │   (Limpieza)     │     │   (KPIs)         │
+└──────────────────┘     └──────────────────┘     └──────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+   siniestros_delta/      silver_siniestros       gold_kpi_mensual
+                                                  gold_top_proveedores
+
+
+### Modelos dbt
+
+| Capa | Modelo | Descripción |
+|---|---|---|
+| **Silver** | `silver_siniestros` | Datos enriquecidos: categorización de importes, estacionalidad, normalización |
+| **Gold** | `gold_kpi_mensual` | KPIs agregados: total siniestros, importe total/promedio por tipo de seguro |
+| **Gold** | `gold_top_proveedores` | Ranking de proveedores: siniestralidad, importes, porcentaje por tipo |
+
+### Ejecución con dbt
+
+```bash
+# Ejecutar todas las transformaciones
+docker exec dbt dbt run
+
+# Ejecutar solo capa Silver
+docker exec dbt dbt run --select silver
+
+# Ejecutar solo capa Gold
+docker exec dbt dbt run --select gold
+
+# Ejecutar tests de calidad de datos (verifica id, importe, tipo segurro, categoria importe)
+docker exec dbt dbt test
+
+# Generar documentación HTML (docuemnta modelos. Servir con dbt (requiere abrir puerto))
+docker exec dbt dbt docs generate
+# Ejecutar en segundo plano
+docker exec -d dbt dbt docs serve --host 0.0.0.0 --port 8083
+```
+
+### Consultas analíticas con DuckDB
+
+dbt utiliza DuckDB como motor analítico, permitiendo consultas SQL directamente sobre las tablas generadas desde dentro del contenedor:
+
+# Entrar al entorno interactivo
+docker exec -it dbt duckdb /dbt_project/analytics.duckdb
+
+# Dentro de DuckDB:
+SELECT * FROM gold_kpi_mensual;
+
+SELECT codigo_proveedor, total_siniestros, importe_total
+FROM gold_top_proveedores
+ORDER BY importe_total DESC
+LIMIT 10;
+
+---
 
 ## ⚡ Delta Lake vs Parquet
 
@@ -238,7 +323,8 @@ El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las 
 |---|---|
 | **Core Data** | Python 3.11, PySpark 3.5, Pandas |
 | **Validación** | Pydantic 2.7 |
-| **SQL / Análisis** | Spark SQL (Bronze / Silver / Gold) |
+| **Transformaciones** | dbt (data build tool) 1.11, DuckDB |
+| **SQL / Análisis** | Spark SQL, dbt SQL, DuckDB |
 | **Formatos** | JSONL, Parquet, Delta Lake |
 | **Contenedores** | Docker, Docker Compose |
 | **Storage** | MinIO (S3-compatible), Sistema de ficheros local |

@@ -87,6 +87,27 @@ services:
         mc mb --ignore-existing local/data-lake;
         echo 'Bucket data-lake ready.';
       "
+  # ─────────────────────────────────────────
+  # dbt - Transformaciones analíticas
+  # ─────────────────────────────────────────
+  dbt:
+    build:
+      context: ./dbt
+      dockerfile: Dockerfile
+    container_name: dbt
+    volumes:
+      - ./dbt:/dbt_project
+      - ./data:/data
+    working_dir: /dbt_project
+    environment:
+      - DBT_PROFILES_DIR=/dbt_project
+    depends_on:
+      - spark-master
+    stdin_open: true
+    tty: true
+    command: tail -f /dev/null
+    ports:
+      - "8083:8083"
 
 volumes:
   minio_data:

@@ -1,0 +1,11 @@
+duckdb:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: 'analytics.duckdb'  # La base de datos DuckDB
+      extensions:
+        - delta  # Extensión para leer Delta Lake
+      settings:
+        threads: 4
+        memory_limit: '2GB'

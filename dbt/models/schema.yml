@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: silver_siniestros
+    description: "Datos limpios y enriquecidos desde Delta Lake"
+    columns:
+      - name: siniestro_id
+        description: "Identificador único del siniestro"
+        tests:
+          - unique
+          - not_null
+      - name: importe_reclamado
+        description: "Importe reclamado en euros"
+        tests:
+          - not_null
+      - name: tipo_seguro_normalizado
+        description: "Tipo de seguro normalizado (HOGAR/COCHE/SALUD)"
+        tests:
+          - accepted_values:
+              values: ['HOGAR', 'COCHE', 'SALUD']
+      - name: categoria_importe
+        description: "Categoría del importe (BAJO/MEDIO/ALTO)"
+        tests:
+          - accepted_values:
+              values: ['BAJO', 'MEDIO', 'ALTO']
+
+  - name: gold_kpi_mensual
+    description: "KPIs agregados mensuales por tipo de seguro"
+    columns:
+      - name: año_mes
+        description: "Año-mes en formato YYYY-MM"
+        tests:
+          - not_null
+      - name: num_siniestros
+        description: "Número total de siniestros"
+        tests:
+          - not_null
+
+  - name: gold_top_proveedores
+    description: "Ranking de proveedores por siniestralidad"
+    columns:
+      - name: codigo_proveedor
+        description: "Código del proveedor"
+        tests:
+          - not_null

@@ -1,0 +1,17 @@
+name: 'legacy_to_lake'
+version: '1.0.0'
+config-version: 2
+
+profile: 'duckdb'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+target-path: "target"
+clean-targets: ['target']
+
+models:
+  legacy_to_lake:
+    silver:
+      +materialized: table
+    gold:
+      +materialized: table
