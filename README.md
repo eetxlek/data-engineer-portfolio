@@ -1,4 +1,4 @@
-# 🏗️ End-to-End Data Pipeline: Legacy to Lake
+# End-to-End Data Platform: Legacy to Lakehouse
 
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![PySpark](https://img.shields.io/badge/Spark-3.5-orange.svg)](https://spark.apache.org/)
@@ -8,11 +8,25 @@
 [![dbt](https://img.shields.io/badge/dbt-1.11-orange.svg)](https://www.getdbt.com/)
 [![DuckDB](https://img.shields.io/badge/DuckDB-1.5.3-yellow.svg)](https://duckdb.org/)
 
-> Pipeline ETL/ELT que simula la migración de datos desde un sistema **legacy (mainframe)** a un **Data Lake moderno**, demostrando validación, procesamiento distribuido y almacenamiento optimizado.
+> Proyecto de Data Engineering inspirado en arquitecturas enterprise de modernización legacy → cloud. 
+
+La plataforma implementa un pipeline ETL/ELT end-to-end con validación de calidad de datos, procesamiento distribuido, arquitectura Medallion y transformaciones analíticas sobre Delta Lake.
 
 ---
 
-## 📐 Arquitectura
+## Características
+
+- ETL/ELT pipelines
+- PySpark batch processing
+- Delta Lake
+- dbt transformations
+- Data Quality
+- Dockerized environment
+- Observability
+
+---
+
+## Arquitectura
 
 ```
 ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
@@ -27,7 +41,46 @@
 
 ---
 
-## 📁 Estructura del Proyecto
+## Data Quality & Governance
+
+El pipeline implementa controles automáticos de calidad y trazabilidad en distintas capas del procesamiento:
+
+### Validation Layer (Pydantic)
+- Schema enforcement
+- Validación de reglas de negocio
+- Rechazo automático de registros inválidos
+- Separación valid/invalid datasets
+
+### dbt Data Tests
+Los modelos analíticos incluyen validaciones automáticas:
+
+- `unique`
+- `not_null`
+- `accepted_values`
+
+Ejemplos:
+- unicidad de `siniestro_id`
+- validación de dominios de negocio (`HOGAR`, `COCHE`, `SALUD`)
+- control de valores nulos en KPIs
+
+### Delta Lake Governance
+- Transaction log (`_delta_log`)
+- Versionado automático
+- Auditoría de operaciones
+- Schema enforcement
+- Time travel support
+
+### Traceability
+Cada fase del pipeline genera logs estructurados:
+- volumen procesado
+- tasa de rechazo
+- motivos de error
+- particiones generadas
+- metadata de ejecución
+
+---
+
+## Estructura del Proyecto
 
 ```
 data-engineer-portfolio/
@@ -77,7 +130,7 @@ data-engineer-portfolio/
 
 ---
 
-## 📊 Flujo de Datos
+## Flujo de Datos
 
 | Fase | Input | Output | Tecnología |
 |---|---|---|---|
@@ -89,7 +142,7 @@ data-engineer-portfolio/
 
 ---
 
-## ✅ Reglas de Negocio
+## Reglas de Negocio
 
 | Campo | Regla de Validación |
 |---|---|
@@ -102,7 +155,7 @@ data-engineer-portfolio/
 
 ---
 
-## 🚀 Ejecución
+## Ejecución
 
 ### Requisitos previos
 
@@ -161,7 +214,7 @@ docker exec dbt duckdb /dbt_project/analytics.duckdb -c "SELECT * FROM gold_kpi_
 
 ---
 
-## 🗄️ Arquitectura Medallion (SQL)
+## Arquitectura Medallion (SQL)
 
 Las queries SQL siguen el patrón **Bronze → Silver → Gold**, ejecutables sobre el Data Lake generado por el pipeline. Requieren que la tabla Delta esté generada previamente.
 
@@ -173,7 +226,7 @@ Las queries SQL siguen el patrón **Bronze → Silver → Gold**, ejecutables so
 
 ---
 
-## 🔄 Transformaciones Analíticas con dbt
+## Transformaciones Analíticas con dbt
 
 El pipeline incorpora **dbt (data build tool)** para transformaciones SQL versionadas sobre el Delta Lake, siguiendo el patrón **Silver → Gold**.
 
@@ -239,7 +292,7 @@ LIMIT 10;
 
 ---
 
-## ⚡ Delta Lake vs Parquet
+## Delta Lake vs Parquet
 
 La capa de almacenamiento usa Delta Lake sobre Parquet, lo que añade capacidades que Parquet puro no tiene:
 
@@ -290,7 +343,7 @@ GROUP BY tipo_seguro;
 
 ---
 
-## 📈 Resultados Esperados
+## Resultados Esperados
 
 Con una tasa de error del 5% (`tasa_error=0.05`) sobre 100 registros:
 
@@ -307,7 +360,7 @@ Los registros válidos se almacenan en Delta Lake particionado por:
 
 ---
 
-## 🔎 Trazabilidad del Pipeline
+## Trazabilidad del Pipeline
 
 Cada ejecución genera un log estructurado en `data/pipeline_trace.jsonl` con métricas por fase:
 
@@ -321,7 +374,7 @@ El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las 
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
 | Categoría | Tecnologías |
 |---|---|
@@ -335,7 +388,7 @@ El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las 
 
 ---
 
-## 👤 Autor
+## Autora
 
 **Eetxlek** - Data Engineer
 
@@ -343,5 +396,3 @@ El log es acumulativo: cada ejecución añade sus entradas sin sobrescribir las 
 - Proyecto: [data-engineer-portfolio](https://github.com/eetxlek/data-engineer-portfolio)
 
 ---
-
-⭐ Si este proyecto te ha sido útil ⭐
